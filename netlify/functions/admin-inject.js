@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'production') {
     log: ['query', 'info', 'warn', 'error'],
     datasources: {
       db: {
-        url: process.env.DATABASE_URL
+        url: process.env.DATABASE_URL || 'file:./db/custom.db'
       }
     }
   })
