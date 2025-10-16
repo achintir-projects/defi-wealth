@@ -51,7 +51,6 @@ This guide explains how to deploy the DeFi Wealth Management application to Netl
    - Go to Site settings → Build & deploy → Environment
    - Add the following environment variables:
      - `DATABASE_URL`: Your Neon connection string
-     - `NETLIFY`: `true`
      - `NODE_ENV`: `production`
 
 3. **Configure Build Settings**:

@@ -5,7 +5,11 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 // Check if we're in a serverless environment (like Netlify, Vercel)
-const isServerless = process.env.NETLIFY || process.env.VERCEL || process.env.RAILWAY_ENVIRONMENT || process.env.AWS_LAMBDA_FUNCTION_NAME
+const isServerless = process.env.NETLIFY_DEPLOY_URL || 
+                      process.env.NETLIFY_SITE_URL || 
+                      process.env.VERCEL || 
+                      process.env.RAILWAY_ENVIRONMENT || 
+                      process.env.AWS_LAMBDA_FUNCTION_NAME
 
 // Check if we're using a production database
 const isProductionDb = process.env.DATABASE_URL?.includes('neon.tech') || 
