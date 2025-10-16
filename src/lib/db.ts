@@ -37,6 +37,10 @@ let db: PrismaClient
 if (isServerless || isProductionDb) {
   // For serverless or production environments, use the configured database URL
   
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is required for serverless or production environments')
+  }
+  
   console.log('Using production database configuration:', {
     environment: isServerless ? 'serverless' : 'production',
     databaseUrl: databaseUrl.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@') // Hide credentials
