@@ -41,6 +41,31 @@
   to = "/.netlify/functions/admin-refresh-prices"
   status = 200
 
+[[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/health"
+  status = 200
+
+[[redirects]]
+  from = "/api/init-demo"
+  to = "/.netlify/functions/init-demo"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/route"
+  to = "/.netlify/functions/admin"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/wallets"
+  to = "/.netlify/functions/admin-wallets"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/wallets/*"
+  to = "/.netlify/functions/admin-wallets-detail/:splat"
+  status = 200
+
 # Handle Next.js static files and client-side routing properly
 [[redirects]]
   from = "/_next/static/*"
@@ -50,6 +75,26 @@
 [[redirects]]
   from = "/_next/data/*"
   to = "/_next/data/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/_next/image/*"
+  to = "/_next/image/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/static/*"
+  to = "/static/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/favicon.ico"
+  to = "/favicon.ico"
+  status = 200
+
+[[redirects]]
+  from = "/logo.svg"
+  to = "/logo.svg"
   status = 200
 
 # Handle client-side routing for all other routes
