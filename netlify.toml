@@ -55,6 +55,6 @@
 
 # Specific function configuration
 [functions."*"]
-  external_node_modules = ["@prisma/client", "prisma", "next", "react", "react-dom"]
+  external_node_modules = ["@prisma/client"]
   timeout = 30
   node_bundler = "esbuild"

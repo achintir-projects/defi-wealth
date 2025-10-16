@@ -4,10 +4,6 @@
   "description": "Netlify functions for the DeFi Wealth Management app",
   "main": "api/api.js",
   "dependencies": {
-    "next": "15.3.5",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "@prisma/client": "^6.11.1",
-    "prisma": "^6.11.1"
+    "@prisma/client": "^6.17.1"
   }
 }
