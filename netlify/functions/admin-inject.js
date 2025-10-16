@@ -45,81 +45,107 @@ function createResponse(statusCode, body, headers = {}) {
 exports.handler = async (event, context) => {
   try {
     const method = event.httpMethod
+    
+    // Verify admin authentication from headers
+    const adminId = event.headers['x-admin-id'] || event.headers['X-Admin-Id']
+    if (!adminId || adminId !== 'admin-user-id') {
+      return createResponse(401, { error: 'Unauthorized: Admin access required' })
+    }
 
     if (method === 'GET') {
       // Get injection history
-      const injections = await prisma.transfer.findMany({
+      const adminUser = await prisma.user.findUnique({
+        where: { id: adminId }
+      })
+
+      if (!adminUser || adminUser.role !== 'admin') {
+        return createResponse(403, { error: 'Unauthorized: Admin privileges required' })
+      }
+
+      const allTransfers = await prisma.transfer.findMany({
         where: {
-          fromUserId: { not: null },
-          metadata: {
-            path: ['type'],
-            equals: 'admin_injection'
+          fromUserId: adminId
+        },
+        include: {
+          toUser: {
+            select: {
+              id: true,
+              email: true,
+              walletAddress: true
+            }
+          },
+          token: {
+            select: {
+              symbol: true,
+              name: true,
+              logo: true
+            }
           }
         },
-        orderBy: { createdAt: 'desc' },
-        take: 50
+        orderBy: {
+          createdAt: 'desc'
+        },
+        take: 100
       })
 
-      // Get related user and token data
-      const userIds = injections.map(i => i.fromUserId).filter(Boolean)
-      const toUserIds = injections.map(i => i.toUserId).filter(Boolean)
-      const tokenSymbols = [...new Set(injections.map(i => i.tokenSymbol))]
-
-      const [users, toUsers, tokens] = await Promise.all([
-        prisma.user.findMany({
-          where: { id: { in: userIds } },
-          select: { id: true, email: true, walletAddress: true }
-        }),
-        prisma.user.findMany({
-          where: { id: { in: toUserIds } },
-          select: { id: true, email: true, walletAddress: true }
-        }),
-        prisma.token.findMany({
-          where: { symbol: { in: tokenSymbols } },
-          select: { id: true, symbol: true, name: true, logo: true }
-        })
-      ])
-
-      const injectionHistory = injections.map(injection => {
-        const admin = users.find(u => u.id === injection.fromUserId)
-        const user = toUsers.find(u => u.id === injection.toUserId)
-        const token = tokens.find(t => t.symbol === injection.tokenSymbol)
-
-        return {
-          id: injection.id,
-          adminEmail: admin?.email || 'Unknown',
-          userWallet: user?.walletAddress || 'Unknown',
-          tokenSymbol: injection.tokenSymbol,
-          tokenName: token?.name || injection.tokenSymbol,
-          tokenLogo: token?.logo || '',
-          amount: injection.amount,
-          timestamp: injection.createdAt,
-          txHash: injection.txHash
-        }
+      // Filter for admin injections
+      const injections = allTransfers.filter(transfer => {
+        const metadata = transfer.metadata || {}
+        return metadata.type === 'admin_injection'
       })
 
-      return createResponse(200, injectionHistory)
+      // Format injections for response
+      const formattedInjections = injections.map(injection => ({
+        id: injection.id,
+        toWallet: injection.toAddress,
+        toUser: injection.toUser,
+        tokenSymbol: injection.tokenSymbol,
+        tokenName: injection.token.name,
+        tokenLogo: injection.token.logo,
+        amount: injection.amount,
+        message: (injection.metadata && injection.metadata.message) || 'Admin token injection',
+        txHash: injection.txHash,
+        createdAt: injection.createdAt,
+        injectedBy: (injection.metadata && injection.metadata.injectedBy) || undefined
+      }))
+
+      return createResponse(200, formattedInjections)
     }
 
     if (method === 'POST') {
       // Handle token injection
       const body = await parseRequestBody(event)
-      const { walletAddress, tokenSymbol, amount } = body
+      const { walletAddress, tokenSymbol, amount, message } = body
 
       if (!walletAddress || !tokenSymbol || !amount) {
         return createResponse(400, { error: 'Missing required fields' })
       }
 
-      // Find user by wallet address
-      const user = await prisma.user.findUnique({
+      // Verify admin user
+      const adminUser = await prisma.user.findUnique({
+        where: { id: adminId }
+      })
+
+      if (!adminUser || adminUser.role !== 'admin') {
+        return createResponse(403, { error: 'Unauthorized: Admin privileges required' })
+      }
+
+      // Find or create the target user by wallet address
+      let targetUser = await prisma.user.findUnique({
         where: { walletAddress }
       })
 
-      if (!user) {
-        return createResponse(404, { error: 'User not found' })
+      if (!targetUser) {
+        targetUser = await prisma.user.create({
+          data: {
+            email: `user-${walletAddress.substring(0, 8)}@defi-wealth.com`,
+            walletAddress,
+            role: 'user'
+          }
+        })
       }
 
-      // Find token
+      // Verify the token exists
       const token = await prisma.token.findUnique({
         where: { symbol: tokenSymbol }
       })
@@ -128,57 +154,67 @@ exports.handler = async (event, context) => {
         return createResponse(404, { error: 'Token not found' })
       }
 
-      // Update user's token balance
-      const updatedBalance = await prisma.userTokenBalance.upsert({
-        where: {
-          userId_tokenSymbol: {
-            userId: user.id,
-            tokenSymbol
-          }
-        },
-        update: {
-          displayBalance: {
-            increment: amount
-          },
-          actualBalance: {
-            increment: amount
-          }
-        },
-        create: {
-          userId: user.id,
-          tokenSymbol,
-          displayBalance: amount,
-          actualBalance: amount
-        }
-      })
+      // Generate transaction hash for the injection
+      const txHash = `0x${Array.from(crypto.getRandomValues(new Uint8Array(32)))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('')}`
 
-      // Create transfer record
-      const transfer = await prisma.transfer.create({
-        data: {
-          fromUserId: user.id,
-          fromAddress: '0x0000000000000000000000000000000000000000', // System address
-          toUserId: user.id,
-          toAddress: walletAddress,
-          tokenSymbol,
-          amount,
-          status: 'completed',
-          txHash: `admin_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          metadata: {
-            type: 'admin_injection',
-            adminId: user.id,
-            timestamp: new Date().toISOString()
+      // Perform the token injection
+      await prisma.$transaction(async (tx) => {
+        // Update or create user token balance
+        await tx.userTokenBalance.upsert({
+          where: {
+            userId_tokenSymbol: {
+              userId: targetUser.id,
+              tokenSymbol: tokenSymbol
+            }
+          },
+          update: {
+            displayBalance: {
+              increment: amount
+            },
+            actualBalance: {
+              increment: amount
+            },
+            updatedAt: new Date()
+          },
+          create: {
+            userId: targetUser.id,
+            tokenSymbol: tokenSymbol,
+            displayBalance: amount,
+            actualBalance: amount
           }
-        }
+        })
+
+        // Record the injection as a transfer from admin
+        await tx.transfer.create({
+          data: {
+            fromUserId: adminUser.id,
+            fromAddress: adminUser.walletAddress || 'admin',
+            toUserId: targetUser.id,
+            toAddress: walletAddress,
+            tokenSymbol,
+            amount,
+            status: 'completed',
+            txHash,
+            metadata: {
+              type: 'admin_injection',
+              message: message || 'Admin token injection',
+              injectedBy: adminUser.id
+            }
+          }
+        })
       })
 
       return createResponse(200, {
-        success: true,
         message: 'Token injection completed successfully',
-        transfer: {
-          id: transfer.id,
-          tokenSymbol: transfer.tokenSymbol,
-          amount: transfer.amount,
-          timestamp: transfer.createdAt
+        injection: {
+          toWallet: walletAddress,
+          tokenSymbol,
+          amount,
+          txHash,
+          injectedBy: adminUser.id,
+          timestamp: new Date().toISOString()
         }
       })
     }
@@ -186,6 +222,9 @@ exports.handler = async (event, context) => {
     return createResponse(405, { error: 'Method not allowed' })
   } catch (error) {
     console.error('Admin Inject API Error:', error)
-    return createResponse(500, { error: 'Internal server error' })
+    return createResponse(500, { 
+      error: 'Internal server error',
+      details: error.message 
+    })
   }
 }
