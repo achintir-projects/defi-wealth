@@ -26,13 +26,33 @@
   to = "/.netlify/functions/trending"
   status = 200
 
-# Handle other API routes with a catch-all function
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api"
+  from = "/api/portfolio"
+  to = "/.netlify/functions/portfolio"
   status = 200
 
-# Handle Next.js static files and client-side routing
+[[redirects]]
+  from = "/api/transfers"
+  to = "/.netlify/functions/transfers"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/refresh-prices"
+  to = "/.netlify/functions/admin-refresh-prices"
+  status = 200
+
+# Handle Next.js static files and client-side routing properly
+[[redirects]]
+  from = "/_next/static/*"
+  to = "/_next/static/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/_next/data/*"
+  to = "/_next/data/:splat"
+  status = 200
+
+# Handle client-side routing for all other routes
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -47,6 +67,22 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+# Ensure proper MIME types for static assets
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Content-Type = "text/css"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+
+[[headers]]
+  for = "*.json"
+  [headers.values]
+    Content-Type = "application/json"
 
 # Function configuration
 [functions]
