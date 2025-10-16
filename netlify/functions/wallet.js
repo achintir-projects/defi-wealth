@@ -168,6 +168,28 @@ async function initializePortfolio(userId, walletAddress) {
   }
 }
 
+// Helper function to ensure admin user exists
+async function ensureAdminUser() {
+  let adminUser = await prisma.user.findUnique({
+    where: { id: 'admin-user-id' }
+  })
+
+  if (!adminUser) {
+    adminUser = await prisma.user.create({
+      data: {
+        id: 'admin-user-id',
+        email: 'admin@defi-wealth.com',
+        name: 'System Administrator',
+        role: 'admin',
+        walletAddress: '0x0000000000000000000000000000000000000000'
+      }
+    })
+    console.log('Admin user created:', adminUser.id)
+  }
+
+  return adminUser
+}
+
 // Helper function to parse request body
 async function parseRequestBody(event) {
   if (!event.body) return {}
@@ -202,6 +224,13 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // Ensure admin user exists for the system
+    try {
+      await ensureAdminUser()
+    } catch (adminError) {
+      console.log('Could not ensure admin user:', adminError)
+    }
+
     // Get wallet address from query parameters
     const { address } = event.queryStringParameters || {}
     
