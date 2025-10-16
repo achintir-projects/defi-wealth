@@ -3,7 +3,8 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
+  NPM_CONFIG_PRODUCTION = "false"
 
 # Production environment variables (these should be set in Netlify dashboard)
 # [context.production.environment]
