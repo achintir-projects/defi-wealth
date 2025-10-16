@@ -1,0 +1,36 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Production environment variables (these should be set in Netlify dashboard)
+# [context.production.environment]
+#   DATABASE_URL = "postgresql://username:password@host.neon.tech/dbname?sslmode=require"
+#   NETLIFY = "true"
+
+# Redirect rules
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for better caching and security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+# Function configuration
+[functions]
+  directory = "netlify/functions"
+
+# Specific function configuration
+[functions."*"]
+  external_node_modules = ["@prisma/client", "prisma"]
+  timeout = 30

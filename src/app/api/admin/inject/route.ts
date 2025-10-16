@@ -184,14 +184,10 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    // Get all admin injections
-    const injections = await db.transfer.findMany({
+    // Get all transfers from admin and filter for injections
+    const allTransfers = await db.transfer.findMany({
       where: {
-        fromUserId: adminId,
-        metadata: {
-          path: 'type',
-          equals: 'admin_injection'
-        }
+        fromUserId: adminId
       },
       include: {
         toUser: {
@@ -213,6 +209,12 @@ export async function GET(request: NextRequest) {
         createdAt: 'desc'
       },
       take: 100
+    })
+    
+    // Filter for admin injections in code
+    const injections = allTransfers.filter(transfer => {
+      const metadata = transfer.metadata as any
+      return metadata && metadata.type === 'admin_injection'
     })
     
     // Format injections for response
