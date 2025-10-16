@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import { Toaster } from "@/components/ui/toaster"
 
 export default async function AdminLayout({
   children,
@@ -8,7 +9,12 @@ export default async function AdminLayout({
 }) {
   // Skip authentication during build time
   if (process.env.NEXT_PHASE === 'phase-production-build') {
-    return <>{children}</>
+    return (
+      <>
+        {children}
+        <Toaster />
+      </>
+    )
   }
 
   const cookieStore = await cookies()
@@ -22,5 +28,10 @@ export default async function AdminLayout({
     redirect('/admin-login')
   }
   
-  return <>{children}</>
+  return (
+    <>
+      {children}
+      <Toaster />
+    </>
+  )
 }
