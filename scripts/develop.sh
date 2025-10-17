@@ -1,22 +1,12 @@
 #!/bin/bash
 
-# Development script to switch back to SQLite
-# This script prepares the project for local development
+# Development script for Neon PostgreSQL
+# This script prepares the project for local development with Neon PostgreSQL
 
-echo "🔧 Switching to SQLite for local development..."
+echo "🔧 Preparing for local development with Neon PostgreSQL..."
 
-# Check if backup exists
-if [ ! -f "prisma/schema.prisma.backup" ]; then
-    echo "❌ No backup schema found. Cannot restore."
-    exit 1
-fi
-
-# Restore the original schema
-cp prisma/schema.prisma.backup prisma/schema.prisma
-echo "✅ Restored SQLite schema for development"
-
-# Generate Prisma client for SQLite
-echo "📦 Generating Prisma client for SQLite..."
+# Generate Prisma client for PostgreSQL
+echo "📦 Generating Prisma client for PostgreSQL..."
 npx prisma generate
 
 if [ $? -eq 0 ]; then
@@ -26,13 +16,12 @@ else
     exit 1
 fi
 
-# Ensure SQLite database exists
-if [ ! -f "dev.db" ]; then
-    echo "📄 Creating SQLite database..."
-    npx prisma db push
-fi
-
-echo "🎉 Project ready for local development!"
+echo "🎉 Project ready for local development with Neon PostgreSQL!"
+echo ""
+echo "📋 Important:"
+echo "1. Using Neon PostgreSQL for both development and production"
+echo "2. All environments share the same database for consistency"
+echo "3. Make sure your Neon database is accessible"
 echo ""
 echo "🔗 To start development server:"
 echo "   npm run dev"

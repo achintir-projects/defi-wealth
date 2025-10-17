@@ -1,20 +1,26 @@
 const fs = require('fs');
 const path = require('path');
 
-// Ensure database directory exists
-const dbDir = path.join(__dirname, '../db');
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
-  console.log('Created database directory:', dbDir);
+// Setup for Neon PostgreSQL
+console.log('🚀 Setting up Neon PostgreSQL for Netlify deployment...');
+
+// Check if DATABASE_URL is available
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  console.warn('⚠️  DATABASE_URL environment variable not found');
+  console.warn('   Make sure to set DATABASE_URL in Netlify environment variables');
+  console.warn('   Example: postgresql://username:password@host.neon.tech/dbname?sslmode=require');
+} else {
+  console.log('✅ DATABASE_URL found:', databaseUrl.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@'));
 }
 
-// Copy the database file if it doesn't exist in the expected location
-const sourceDb = path.join(__dirname, '../db/custom.db');
-const targetDb = path.join(__dirname, '../db/custom.db');
-
-if (fs.existsSync(sourceDb) && !fs.existsSync(targetDb)) {
-  fs.copyFileSync(sourceDb, targetDb);
-  console.log('Copied database file to:', targetDb);
+// Ensure Prisma client is generated
+const prismaClientPath = path.join(__dirname, '../node_modules/.prisma/client');
+if (fs.existsSync(prismaClientPath)) {
+  console.log('✅ Prisma client found');
+} else {
+  console.log('📦 Prisma client not found, will be generated during build');
 }
 
-console.log('Database setup completed');
+console.log('✅ Neon PostgreSQL setup completed');

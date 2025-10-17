@@ -11,43 +11,24 @@ const isServerless = process.env.NETLIFY_DEPLOY_URL ||
                       process.env.RAILWAY_ENVIRONMENT || 
                       process.env.AWS_LAMBDA_FUNCTION_NAME
 
-// Check if we're using a production database
-const isProductionDb = process.env.DATABASE_URL?.includes('neon.tech') || 
-                      process.env.DATABASE_URL?.includes('supabase.co') ||
-                      process.env.DATABASE_URL?.includes('planetscale.com') ||
-                      process.env.DATABASE_URL?.includes('postgresql://') ||
-                      process.env.DATABASE_URL?.includes('mysql://')
-
 // Use the configured database URL
-let databaseUrl = process.env.DATABASE_URL
+const databaseUrl = process.env.DATABASE_URL
 
-// For local development, default to SQLite if no DATABASE_URL is provided
-if (!databaseUrl && !isServerless) {
-  databaseUrl = 'file:./dev.db'
-}
-
-// For serverless environments, require a proper database URL
-if (isServerless && !databaseUrl) {
-  console.warn('WARNING: No DATABASE_URL provided for serverless environment. Using fallback SQLite (not recommended for production)')
-  databaseUrl = 'file:./dev.db'
+// Require DATABASE_URL for all environments
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL is required. Please configure your Neon PostgreSQL connection string.')
 }
 
 let db: PrismaClient
 
-if (isServerless || isProductionDb) {
-  // For serverless or production environments, use the configured database URL
-  
-  if (!databaseUrl) {
-    throw new Error('DATABASE_URL is required for serverless or production environments')
-  }
-  
-  console.log('Using production database configuration:', {
-    environment: isServerless ? 'serverless' : 'production',
-    databaseUrl: databaseUrl.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@') // Hide credentials
-  })
-  
-  // Configure Prisma for serverless environments
-  db = new PrismaClient({
+console.log('Using Neon PostgreSQL database:', {
+  environment: isServerless ? 'serverless' : 'development',
+  databaseUrl: databaseUrl.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@') // Hide credentials
+})
+
+// Configure Prisma for optimal performance with Neon PostgreSQL
+db = globalForPrisma.prisma ??
+  new PrismaClient({
     log: ['query', 'info', 'warn', 'error'],
     datasources: {
       db: {
@@ -55,20 +36,13 @@ if (isServerless || isProductionDb) {
       }
     }
   })
-  
-  // Enable connection pooling for better performance in serverless
-  if (databaseUrl.includes('neon.tech')) {
-    // Neon-specific configuration for better serverless performance
-    process.env.DATABASE_URL = databaseUrl + '&pgbouncer=true'
-  }
-} else {
-  // For local development with SQLite
-  db = globalForPrisma.prisma ??
-    new PrismaClient({
-      log: ['query'],
-    })
 
-  if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
+// Enable connection pooling for better performance in serverless
+if (databaseUrl.includes('neon.tech')) {
+  // Neon-specific configuration for better serverless performance
+  process.env.DATABASE_URL = databaseUrl + '&pgbouncer=true'
 }
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
 
 export { db }
