@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
     })
     
     // Also check if the transfer was created
-    const createdTransfer = await db.transfer.findUnique({
+    const createdTransfer = await db.transfer.findFirst({
       where: { txHash },
       include: {
         fromUser: {
