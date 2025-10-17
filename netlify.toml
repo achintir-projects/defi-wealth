@@ -137,7 +137,7 @@
 # Function configuration
 [functions]
   directory = "netlify/functions"
-  included_files = ["prisma/schema.prisma", "db/**/*", "prisma/db/**/*"]
+  included_files = ["prisma/schema.prisma", "db/**/*", "prisma/db/**/*", "tmp/**/*"]
 
 # Specific function configuration
 [functions."*"]
