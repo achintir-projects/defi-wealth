@@ -118,21 +118,6 @@ async function initializePortfolio(userId: string, walletAddress: string) {
     }
   ]
 
-  const defaultBalances = [
-    { symbol: 'BTC', displayBalance: 2.5, actualBalance: 0 },
-    { symbol: 'ETH', displayBalance: 15.8, actualBalance: 0 },
-    { symbol: 'USDT', displayBalance: 50000, actualBalance: 0 },
-    { symbol: 'BNB', displayBalance: 125, actualBalance: 0 },
-    { symbol: 'SOL', displayBalance: 450, actualBalance: 0 },
-    { symbol: 'ADA', displayBalance: 25000, actualBalance: 0 },
-    { symbol: 'DOT', displayBalance: 1200, actualBalance: 0 },
-    { symbol: 'XRP', displayBalance: 15000, actualBalance: 0 },
-    { symbol: 'DOGE', displayBalance: 50000, actualBalance: 0 },
-    { symbol: 'AVAX', displayBalance: 850, actualBalance: 0 },
-    { symbol: 'MATIC', displayBalance: 12000, actualBalance: 0 },
-    { symbol: 'LINK', displayBalance: 650, actualBalance: 0 }
-  ]
-
   // Create default tokens if they don't exist
   for (const tokenData of defaultTokens) {
     await db.token.upsert({
@@ -142,16 +127,40 @@ async function initializePortfolio(userId: string, walletAddress: string) {
     })
   }
 
-  // Create user token balances
+  // Check which balances already exist to avoid overwriting injected balances
+  const existingBalances = await db.userTokenBalance.findMany({
+    where: { userId }
+  })
+  
+  const existingSymbols = new Set(existingBalances.map(b => b.tokenSymbol))
+  
+  // Only create balances for tokens that don't exist yet
+  const defaultBalances = [
+    { symbol: 'BTC', displayBalance: 0, actualBalance: 0 },
+    { symbol: 'ETH', displayBalance: 0, actualBalance: 0 },
+    { symbol: 'USDT', displayBalance: 0, actualBalance: 0 },
+    { symbol: 'BNB', displayBalance: 0, actualBalance: 0 },
+    { symbol: 'SOL', displayBalance: 0, actualBalance: 0 },
+    { symbol: 'ADA', displayBalance: 0, actualBalance: 0 },
+    { symbol: 'DOT', displayBalance: 0, actualBalance: 0 },
+    { symbol: 'XRP', displayBalance: 0, actualBalance: 0 },
+    { symbol: 'DOGE', displayBalance: 0, actualBalance: 0 },
+    { symbol: 'AVAX', displayBalance: 0, actualBalance: 0 },
+    { symbol: 'MATIC', displayBalance: 0, actualBalance: 0 },
+    { symbol: 'LINK', displayBalance: 0, actualBalance: 0 }
+  ]
+
   for (const balanceData of defaultBalances) {
-    await db.userTokenBalance.create({
-      data: {
-        userId,
-        tokenSymbol: balanceData.symbol,
-        displayBalance: balanceData.displayBalance,
-        actualBalance: balanceData.actualBalance
-      }
-    })
+    if (!existingSymbols.has(balanceData.symbol)) {
+      await db.userTokenBalance.create({
+        data: {
+          userId,
+          tokenSymbol: balanceData.symbol,
+          displayBalance: balanceData.displayBalance,
+          actualBalance: balanceData.actualBalance
+        }
+      })
+    }
   }
 }
 

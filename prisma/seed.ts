@@ -30,20 +30,20 @@ async function main() {
     }
   })
 
-  // Create tokens
+  // Create tokens with current market prices (October 2025)
   const tokens = [
-    { symbol: 'BTC', name: 'Bitcoin', decimals: 8, marketPrice: 45000, displayPrice: 45000 },
-    { symbol: 'ETH', name: 'Ethereum', decimals: 18, marketPrice: 3000, displayPrice: 3000 },
-    { symbol: 'USDT', name: 'Tether', decimals: 6, marketPrice: 1, displayPrice: 1 },
-    { symbol: 'USDC', name: 'USD Coin', decimals: 6, marketPrice: 1, displayPrice: 1 },
-    { symbol: 'BNB', name: 'Binance Coin', decimals: 18, marketPrice: 400, displayPrice: 400 },
-    { symbol: 'SOL', name: 'Solana', decimals: 9, marketPrice: 100, displayPrice: 100 },
-    { symbol: 'XRP', name: 'Ripple', decimals: 6, marketPrice: 0.6, displayPrice: 0.6 },
-    { symbol: 'ADA', name: 'Cardano', decimals: 6, marketPrice: 0.5, displayPrice: 0.5 },
-    { symbol: 'DOT', name: 'Polkadot', decimals: 10, marketPrice: 7, displayPrice: 7 },
-    { symbol: 'DOGE', name: 'Dogecoin', decimals: 8, marketPrice: 0.08, displayPrice: 0.08 },
-    { symbol: 'AVAX', name: 'Avalanche', decimals: 18, marketPrice: 35, displayPrice: 35 },
-    { symbol: 'MATIC', name: 'Polygon', decimals: 18, marketPrice: 0.8, displayPrice: 0.8 }
+    { symbol: 'BTC', name: 'Bitcoin', decimals: 8, marketPrice: 109000, displayPrice: 109000 },
+    { symbol: 'ETH', name: 'Ethereum', decimals: 18, marketPrice: 3900, displayPrice: 3900 },
+    { symbol: 'USDT', name: 'Tether', decimals: 6, marketPrice: 1.00, displayPrice: 1.00 },
+    { symbol: 'USDC', name: 'USD Coin', decimals: 6, marketPrice: 1.00, displayPrice: 1.00 },
+    { symbol: 'BNB', name: 'BNB', decimals: 18, marketPrice: 1148, displayPrice: 1148 },
+    { symbol: 'SOL', name: 'Solana', decimals: 9, marketPrice: 187, displayPrice: 187 },
+    { symbol: 'XRP', name: 'Ripple', decimals: 6, marketPrice: 2.36, displayPrice: 2.36 },
+    { symbol: 'ADA', name: 'Cardano', decimals: 6, marketPrice: 0.65, displayPrice: 0.65 },
+    { symbol: 'DOT', name: 'Polkadot', decimals: 10, marketPrice: 3.04, displayPrice: 3.04 },
+    { symbol: 'DOGE', name: 'Dogecoin', decimals: 8, marketPrice: 0.19, displayPrice: 0.19 },
+    { symbol: 'AVAX', name: 'Avalanche', decimals: 18, marketPrice: 20.92, displayPrice: 20.92 },
+    { symbol: 'MATIC', name: 'Polygon', decimals: 18, marketPrice: 0.19, displayPrice: 0.19 }
   ]
 
   for (const token of tokens) {
