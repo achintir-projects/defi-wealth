@@ -78,9 +78,9 @@ export async function initializePortfolio(userId: string, walletAddress: string)
       
       await db.userTokenBalance.upsert({
         where: {
-          userId_tokenId: {
+          userId_tokenSymbol: {
             userId: userId,
-            tokenId: tokenData.symbol
+            tokenSymbol: tokenData.symbol
           }
         },
         update: {
@@ -89,7 +89,7 @@ export async function initializePortfolio(userId: string, walletAddress: string)
         },
         create: {
           userId: userId,
-          tokenId: tokenData.symbol,
+          tokenSymbol: tokenData.symbol,
           balance: initialBalance,
           displayBalance: initialBalance
         }
