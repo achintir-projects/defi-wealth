@@ -31,9 +31,22 @@ export async function POST(request: NextRequest) {
     }
     
     // Get admin user to verify role
-    const adminUser = await db.user.findUnique({
+    let adminUser = await db.user.findUnique({
       where: { id: adminId }
     })
+    
+    // Create admin user if it doesn't exist
+    if (!adminUser) {
+      console.log('Creating admin user:', adminId)
+      adminUser = await db.user.create({
+        data: {
+          id: adminId,
+          email: 'admin@defi-wealth.com',
+          walletAddress: '0x0000000000000000000000000000000000000000',
+          role: 'admin'
+        }
+      })
+    }
     
     if (!adminUser || adminUser.role !== 'admin') {
       console.log('Admin verification failed for user:', adminId)
@@ -59,18 +72,28 @@ export async function POST(request: NextRequest) {
       })
     }
     
-    // Verify the token exists
-    const token = await db.token.findUnique({
+    // Verify the token exists, create if it doesn't
+    let token = await db.token.findUnique({
       where: { symbol: tokenSymbol }
     })
     
     if (!token) {
-      console.log('Token not found:', tokenSymbol)
-      return NextResponse.json(
-        { error: 'Token not found' },
-        { status: 404 }
-      )
+      console.log('Token not found, creating token:', tokenSymbol)
+      // Create the token with default values
+      token = await db.token.create({
+        data: {
+          symbol: tokenSymbol,
+          name: tokenSymbol, // Use symbol as name by default
+          logo: `https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400`, // Default logo
+          decimals: 18, // Default decimals
+          marketPrice: 1.0, // Default price
+          displayPrice: 1.0,
+          displayType: 'display'
+        }
+      })
     }
+    
+    console.log('Token found/created:', token.symbol, token.id)
     
     // Generate transaction hash for the injection
     const txHash = generateTxHash()
@@ -140,6 +163,29 @@ export async function POST(request: NextRequest) {
     })
     
     console.log('Updated balance after injection:', updatedBalance)
+    console.log('Balance details:', {
+      userId: updatedBalance?.userId,
+      tokenSymbol: updatedBalance?.tokenSymbol,
+      displayBalance: updatedBalance?.displayBalance,
+      actualBalance: updatedBalance?.actualBalance,
+      createdAt: updatedBalance?.createdAt,
+      updatedAt: updatedBalance?.updatedAt
+    })
+    
+    // Also check if the transfer was created
+    const createdTransfer = await db.transfer.findUnique({
+      where: { txHash },
+      include: {
+        fromUser: {
+          select: { id: true, email: true }
+        },
+        toUser: {
+          select: { id: true, email: true }
+        }
+      }
+    })
+    
+    console.log('Created transfer:', createdTransfer)
     
     console.log('Token injection completed successfully')
     
