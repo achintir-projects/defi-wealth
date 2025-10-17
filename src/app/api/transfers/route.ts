@@ -322,6 +322,8 @@ export async function GET(request: NextRequest) {
         take: 50 // Limit to last 50 transfers
       })
       
+      console.log('Found transfers:', transfers.length, 'for user:', user.id)
+      
       // Format transfers for frontend
       const formattedTransfers = transfers.map(transfer => {
         const isSent = transfer.fromUserId === user.id

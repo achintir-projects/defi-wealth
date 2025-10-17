@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     // Perform the token injection
     await db.$transaction(async (tx) => {
       // Update or create user token balance
-      await tx.userTokenBalance.upsert({
+      const balanceResult = await tx.userTokenBalance.upsert({
         where: {
           userId_tokenSymbol: {
             userId: targetUser.id,
@@ -104,8 +104,10 @@ export async function POST(request: NextRequest) {
         }
       })
       
+      console.log('Balance update result:', balanceResult)
+      
       // Record the injection as a transfer from admin
-      await tx.transfer.create({
+      const transferResult = await tx.transfer.create({
         data: {
           fromUserId: adminUser.id,
           fromAddress: adminUser.walletAddress || 'admin',
@@ -123,7 +125,21 @@ export async function POST(request: NextRequest) {
           }
         }
       })
+      
+      console.log('Transfer creation result:', transferResult)
     })
+    
+    // Verify the injection was successful by checking the updated balance
+    const updatedBalance = await db.userTokenBalance.findUnique({
+      where: {
+        userId_tokenSymbol: {
+          userId: targetUser.id,
+          tokenSymbol: tokenSymbol
+        }
+      }
+    })
+    
+    console.log('Updated balance after injection:', updatedBalance)
     
     console.log('Token injection completed successfully')
     

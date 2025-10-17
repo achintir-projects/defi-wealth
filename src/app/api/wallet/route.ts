@@ -203,8 +203,12 @@ export async function GET(request: NextRequest) {
         }
       })
 
+      // Debug log to check balances
+      console.log('User balances found:', userBalances.length, 'for user:', user.id)
+
       // If user has no balances (shouldn't happen after initialization, but just in case)
       if (userBalances.length === 0) {
+        console.log('No balances found, initializing portfolio...')
         await initializePortfolio(user.id, user.walletAddress || walletAddress)
         // Try fetching balances again
         const updatedBalances = await db.userTokenBalance.findMany({
@@ -219,6 +223,8 @@ export async function GET(request: NextRequest) {
             }
           }
         })
+        
+        console.log('Updated balances after initialization:', updatedBalances.length)
         
         if (updatedBalances.length === 0) {
           return NextResponse.json({

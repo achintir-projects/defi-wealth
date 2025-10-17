@@ -99,6 +99,7 @@ function HomeContent() {
   const [importWalletAddress, setImportWalletAddress] = useState('')
   const [showImportDialog, setShowImportDialog] = useState(false)
   const [savedWallets, setSavedWallets] = useState<string[]>([])
+  const [pricesSource, setPricesSource] = useState<'realtime' | 'fallback'>('fallback')
 
   const refreshData = async () => {
     console.log('Refreshing data...')
@@ -108,11 +109,35 @@ function HomeContent() {
     setPortfolio(null)
     setLoading(true)
     
-    // Force refresh prices
+    // Force refresh prices and check source
     try {
-      await fetch('/api/admin/refresh-prices', { method: 'POST' })
+      const response = await fetch('/api/admin/refresh-prices', { method: 'POST' })
+      if (response.ok) {
+        // Try to get price source info
+        try {
+          const walletResponse = await fetch('/api/wallet?address=dummy', { 
+            headers: { 'x-wallet-address': 'dummy' }
+          })
+          if (walletResponse.ok) {
+            const data = await walletResponse.json()
+            // Check if we have real-time price data
+            if (data.tokens && data.tokens.length > 0) {
+              const firstToken = data.tokens[0]
+              if (firstToken.lastUpdated && firstToken.marketCap > 0) {
+                setPricesSource('realtime')
+              } else {
+                setPricesSource('fallback')
+              }
+            }
+          }
+        } catch (error) {
+          console.log('Could not determine price source, using fallback')
+          setPricesSource('fallback')
+        }
+      }
     } catch (error) {
       console.log('Price refresh failed, but continuing with data refresh')
+      setPricesSource('fallback')
     }
     
     // Small delay to ensure price refresh is complete
@@ -189,6 +214,18 @@ function HomeContent() {
         if (!portfolioData || !portfolioData.tokens || !Array.isArray(portfolioData.tokens)) {
           console.error('Invalid portfolio data structure:', portfolioData)
           throw new Error('Invalid portfolio data structure')
+        }
+        
+        // Check if we have real-time price data
+        if (portfolioData.tokens && portfolioData.tokens.length > 0) {
+          const firstToken = portfolioData.tokens[0]
+          if (firstToken.lastUpdated && firstToken.marketCap > 0) {
+            setPricesSource('realtime')
+            console.log('Detected real-time price data')
+          } else {
+            setPricesSource('fallback')
+            console.log('Using fallback price data')
+          }
         }
         
         setPortfolio(portfolioData)
@@ -617,6 +654,13 @@ function HomeContent() {
             <Button variant="outline" size="icon" className="crypto-card" onClick={refreshData} title="Refresh">
               <Activity className="h-4 w-4" />
             </Button>
+            {/* Price source indicator */}
+            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-muted/50">
+              <div className={`w-2 h-2 rounded-full ${pricesSource === 'realtime' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+              <span className="text-xs text-muted-foreground">
+                {pricesSource === 'realtime' ? 'Live' : 'Demo'}
+              </span>
+            </div>
             <Button variant="outline" size="icon" className="crypto-card">
               <Plus className="h-4 w-4" />
             </Button>
