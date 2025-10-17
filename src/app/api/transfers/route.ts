@@ -240,6 +240,15 @@ export async function POST(request: NextRequest) {
 // Helper function to get default user wallet address
 async function getDefaultUserWalletAddress(): Promise<string | null> {
   try {
+    // Try to get the test user first
+    const testUser = await db.user.findUnique({
+      where: { walletAddress: '0x1234567890123456789012345678901234567890' }
+    })
+    if (testUser) {
+      return testUser.walletAddress
+    }
+    
+    // Fallback to demo user
     const defaultUser = await db.user.findUnique({
       where: { id: 'demo-user-id' }
     })
@@ -253,13 +262,14 @@ async function getDefaultUserWalletAddress(): Promise<string | null> {
 // GET /api/transfers - Get user's transfer history
 export async function GET(request: NextRequest) {
   try {
-    // Get the user's wallet address from the request headers or use a default
+    // Get the user's wallet address from the request headers, query params, or use a default
     const walletAddress = request.headers.get('x-wallet-address') || 
                           request.headers.get('x-user-wallet-address') ||
+                          request.nextUrl.searchParams.get('walletAddress') ||
                           (await getDefaultUserWalletAddress())
     
     if (!walletAddress) {
-      console.log('No wallet address found, using fallback')
+      console.log('No wallet address found in headers or params, using fallback')
       // Return empty array or mock data if no wallet address
       return NextResponse.json([])
     }

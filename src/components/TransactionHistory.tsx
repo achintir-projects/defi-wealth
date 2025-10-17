@@ -39,21 +39,39 @@ export default function TransactionHistory({ refreshKey }: TransactionHistoryPro
       // Get current wallet address from localStorage
       const walletAddress = localStorage.getItem('currentWalletAddress')
       
+      let url = '/api/transfers'
+      
+      // If we have a wallet address, try passing it as a query parameter first
+      if (walletAddress) {
+        url += `?walletAddress=${encodeURIComponent(walletAddress)}`
+      }
+      
       const headers: Record<string, string> = {
         'Content-Type': 'application/json'
       }
       
+      // Also include it in headers for backward compatibility
       if (walletAddress) {
         headers['x-wallet-address'] = walletAddress
       }
       
-      const response = await fetch('/api/transfers', { headers })
+      const response = await fetch(url, { headers })
       if (response.ok) {
         const transfersData = await response.json()
         console.log('Received transfer history:', transfersData)
         setTransfers(transfersData || [])
       } else {
         console.error('Failed to fetch transfers:', response.status, response.statusText)
+        // If the request fails, try with just headers as fallback
+        if (walletAddress) {
+          const fallbackResponse = await fetch('/api/transfers', { 
+            headers: { 'Content-Type': 'application/json', 'x-wallet-address': walletAddress }
+          })
+          if (fallbackResponse.ok) {
+            const transfersData = await fallbackResponse.json()
+            setTransfers(transfersData || [])
+          }
+        }
       }
     } catch (error) {
       console.error('Error fetching transfers:', error)
