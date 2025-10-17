@@ -35,7 +35,7 @@ try {
     log: ['query', 'info', 'warn', 'error'],
     datasources: {
       db: {
-        url: process.env.DATABASE_URL || 'file:/tmp/custom.db'
+        url: 'postgresql://neondb_owner:npg_wXTnomgL35AS@ep-dry-boat-ad6qzm6q-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require'
       }
     }
   })
