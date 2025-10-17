@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ArrowLeft, Plus, Send, History, Settings, Shield, Wallet, Coins, Users, Search, Eye, Flag } from 'lucide-react'
+import { ArrowLeft, Plus, Send, History, Settings, Shield, Wallet, Coins, Users, Search, Eye, Flag, DollarSign, Activity } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface Token {
