@@ -314,19 +314,33 @@ function HomeContent() {
       return
     }
     
+    // Trim whitespace and validate
+    const trimmedAddress = importWalletAddress.trim()
+    
     // Basic validation for Ethereum address format
-    if (!isValidEthereumAddress(importWalletAddress)) {
-      alert('Please enter a valid Ethereum address (must start with 0x and be 42 characters long)')
+    if (!isValidEthereumAddress(trimmedAddress)) {
+      alert('Please enter a valid Ethereum address (must start with 0x and be 42 characters long with valid hex characters)')
       return
     }
     
     try {
+      console.log('Importing wallet address:', trimmedAddress)
+      
+      // Test if the wallet address works by making a quick API call
+      const testResponse = await fetch(`/api/wallet?address=${encodeURIComponent(trimmedAddress)}`)
+      if (testResponse.ok) {
+        const testData = await testResponse.json()
+        console.log('Wallet test successful:', testData)
+      } else {
+        console.log('Wallet test failed, but continuing with import:', testResponse.status)
+      }
+      
       // Save the imported wallet address
-      localStorage.setItem('currentWalletAddress', importWalletAddress)
+      localStorage.setItem('currentWalletAddress', trimmedAddress)
       
       // Add to saved wallets list if not already there
-      if (!savedWallets.includes(importWalletAddress)) {
-        const updatedSavedWallets = [...savedWallets, importWalletAddress]
+      if (!savedWallets.includes(trimmedAddress)) {
+        const updatedSavedWallets = [...savedWallets, trimmedAddress]
         setSavedWallets(updatedSavedWallets)
         localStorage.setItem('savedWallets', JSON.stringify(updatedSavedWallets))
       }
@@ -339,9 +353,11 @@ function HomeContent() {
       
       // Refresh portfolio to get the correct wallet address
       refreshData()
+      
+      console.log('Wallet import completed successfully')
     } catch (error) {
       console.error('Failed to import wallet:', error)
-      alert('Failed to import wallet address')
+      alert('Failed to import wallet address. Please try again.')
     }
   }
 

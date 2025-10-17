@@ -177,6 +177,17 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Validate the wallet address format
+    const { isValidEthereumAddress } = await import('@/lib/walletUtils')
+    if (!isValidEthereumAddress(walletAddress)) {
+      return NextResponse.json(
+        { error: 'Invalid wallet address format' },
+        { status: 400 }
+      )
+    }
+
+    console.log('Processing wallet request for address:', walletAddress)
+    
     // Check if database is available
     try {
       // Find user by wallet address
@@ -184,8 +195,9 @@ export async function GET(request: NextRequest) {
         where: { walletAddress }
       })
 
-      // If user doesn't exist, create them
+      // If user doesn't exist, create them automatically for any valid Ethereum address
       if (!user) {
+        console.log('Creating new user for wallet address:', walletAddress)
         user = await db.user.create({
           data: {
             email: `user-${walletAddress.substring(0, 8)}@defi-wealth.com`,
@@ -194,8 +206,14 @@ export async function GET(request: NextRequest) {
           }
         })
         
+        console.log('Created new user:', user.id, 'for wallet:', walletAddress)
+        
         // Initialize portfolio with default tokens for new users
         await initializePortfolio(user.id, user.walletAddress || walletAddress)
+        
+        console.log('Portfolio initialized for new user:', user.id)
+      } else {
+        console.log('Found existing user:', user.id, 'for wallet:', walletAddress)
       }
 
       // Get user's token balances
@@ -307,9 +325,16 @@ export async function GET(request: NextRequest) {
         user: {
           role: user.role,
           walletAddress: user.walletAddress
+        },
+        // Include metadata about the wallet
+        walletInfo: {
+          isNew: userBalances.length === 0,
+          createdAt: user.createdAt,
+          walletType: walletAddress.startsWith('0x7') ? 'imported' : 'generated'
         }
       }
 
+      console.log('Returning portfolio for wallet:', walletAddress, 'with', tokens.length, 'tokens')
       return NextResponse.json(portfolio)
     } catch (dbError) {
       console.log('Database not available, using fallback data:', dbError)
@@ -321,6 +346,11 @@ export async function GET(request: NextRequest) {
         user: {
           role: 'user',
           walletAddress: walletAddress
+        },
+        walletInfo: {
+          isNew: true,
+          createdAt: new Date().toISOString(),
+          walletType: walletAddress.startsWith('0x7') ? 'imported' : 'generated'
         }
       })
     }

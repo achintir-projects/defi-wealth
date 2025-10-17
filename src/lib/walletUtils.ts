@@ -51,21 +51,25 @@ export function generateDemoWalletAddress(seed: string = 'demo'): string {
 
 /**
  * Validate if a string is a properly formatted Ethereum address
- * This is a basic validation - in production you'd want proper checksum validation
+ * This accepts any valid Ethereum address (0x followed by 40 hex characters)
+ * Both checksummed and non-checksummed addresses are accepted
  */
 export function isValidEthereumAddress(address: string): boolean {
   if (!address || typeof address !== 'string') {
     return false
   }
   
+  // Remove any whitespace and convert to lowercase for validation
+  const trimmedAddress = address.trim().toLowerCase()
+  
   // Check basic format: starts with 0x and is 42 characters long
-  if (!address.startsWith('0x') || address.length !== 42) {
+  if (!trimmedAddress.startsWith('0x') || trimmedAddress.length !== 42) {
     return false
   }
   
   // Check that all characters after 0x are valid hex characters
-  const hexPart = address.substring(2)
-  return /^[0-9a-fA-F]{40}$/.test(hexPart)
+  const hexPart = trimmedAddress.substring(2)
+  return /^[0-9a-f]{40}$/.test(hexPart)
 }
 
 /**

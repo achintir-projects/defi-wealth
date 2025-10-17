@@ -44,10 +44,24 @@ interface WalletInfo {
   createdAt: string
   lastActivity: string
   totalValue: number
+  totalInjectedValue: number
+  totalSentValue: number
+  netFlow: number
   tokenCount: number
-  transferCount: number
+  sentTransferCount: number
+  receivedTransferCount: number
+  totalTransferCount: number
+  tokenDistribution: Array<{
+    symbol: string
+    name: string
+    balance: number
+    value: number
+    percentage: number
+  }>
+  walletType: 'generated' | 'imported'
   isFlagged: boolean
   flagReason?: string
+  role: string
 }
 
 export default function AdminPage() {
@@ -60,6 +74,7 @@ export default function AdminPage() {
   const [tokens, setTokens] = useState<Token[]>([])
   const [injections, setInjections] = useState<Injection[]>([])
   const [wallets, setWallets] = useState<WalletInfo[]>([])
+  const [systemStats, setSystemStats] = useState<any>(null)
   const [walletSearchTerm, setWalletSearchTerm] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
@@ -130,6 +145,8 @@ export default function AdminPage() {
       if (response.ok) {
         const data = await response.json()
         setWallets(data.wallets || [])
+        setSystemStats(data.systemStats || null)
+        console.log('System stats loaded:', data.systemStats)
       }
     } catch (error) {
       console.error('Failed to load wallets:', error)
@@ -295,29 +312,44 @@ export default function AdminPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="crypto-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Wallets</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold gradient-text">{wallets.length}</div>
+              <div className="text-2xl font-bold gradient-text">{systemStats?.totalWallets || wallets.length}</div>
               <p className="text-xs text-muted-foreground">
-                System and imported wallets
+                {systemStats?.generatedWallets || 0} generated, {systemStats?.importedWallets || 0} imported
               </p>
             </CardContent>
           </Card>
 
           <Card className="crypto-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Available Tokens</CardTitle>
-              <Wallet className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Total Value</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold gradient-text">{tokens.length}</div>
+              <div className="text-2xl font-bold gradient-text">
+                {systemStats ? formatCurrency(systemStats.totalSystemValue) : '$0'}
+              </div>
               <p className="text-xs text-muted-foreground">
-                Tokens ready for injection
+                Across all wallets
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="crypto-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Transfers</CardTitle>
+              <Activity className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold gradient-text">{systemStats?.totalTransfers || 0}</div>
+              <p className="text-xs text-muted-foreground">
+                {systemStats?.flaggedWallets || 0} flagged wallets
               </p>
             </CardContent>
           </Card>
@@ -330,7 +362,7 @@ export default function AdminPage() {
             <CardContent>
               <div className="text-2xl font-bold text-green-600">Active</div>
               <p className="text-xs text-muted-foreground">
-                All systems operational
+                {tokens.length} tokens available
               </p>
             </CardContent>
           </Card>
@@ -441,7 +473,8 @@ export default function AdminPage() {
                   Wallet Management
                 </CardTitle>
                 <CardDescription>
-                  View all wallets in the system including system-created and imported wallets.
+                  View all wallets in the system including system-generated and imported wallets. 
+                  Track total value, transfers, and token distribution for complete accounting.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -471,21 +504,45 @@ export default function AdminPage() {
                     </div>
                   ) : (
                     filteredWallets.map((wallet) => (
-                      <div key={wallet.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div key={wallet.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-blue-100 rounded-full">
-                            <Wallet className="h-4 w-4 text-blue-600" />
+                          <div className={`p-2 rounded-full ${wallet.walletType === 'imported' ? 'bg-green-100' : 'bg-blue-100'}`}>
+                            <Wallet className={`h-4 w-4 ${wallet.walletType === 'imported' ? 'text-green-600' : 'text-blue-600'}`} />
                           </div>
                           <div>
-                            <div className="font-medium">
+                            <div className="font-medium flex items-center gap-2">
                               {formatAddress(wallet.walletAddress)}
+                              <Badge variant="outline" className="text-xs">
+                                {wallet.walletType}
+                              </Badge>
+                              {wallet.role === 'admin' && (
+                                <Badge variant="secondary" className="text-xs">
+                                  Admin
+                                </Badge>
+                              )}
                             </div>
                             <div className="text-sm text-muted-foreground">
                               {wallet.email}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              Created: {new Date(wallet.createdAt).toLocaleDateString()}
+                              Created: {new Date(wallet.createdAt).toLocaleDateString()} • 
+                              Last active: {new Date(wallet.lastActivity).toLocaleDateString()}
                             </div>
+                            {wallet.tokenDistribution.length > 0 && (
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-muted-foreground">Tokens:</span>
+                                {wallet.tokenDistribution.slice(0, 3).map(token => (
+                                  <Badge key={token.symbol} variant="outline" className="text-xs">
+                                    {token.symbol} ({token.percentage.toFixed(1)}%)
+                                  </Badge>
+                                ))}
+                                {wallet.tokenDistribution.length > 3 && (
+                                  <span className="text-xs text-muted-foreground">
+                                    +{wallet.tokenDistribution.length - 3} more
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div className="text-right">
@@ -493,7 +550,14 @@ export default function AdminPage() {
                             {formatCurrency(wallet.totalValue)}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {wallet.tokenCount} tokens • {wallet.transferCount} transfers
+                            {wallet.tokenCount} tokens • {wallet.totalTransferCount} transfers
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            In: {formatCurrency(wallet.totalInjectedValue)} • 
+                            Out: {formatCurrency(wallet.totalSentValue)} • 
+                            Net: <span className={wallet.netFlow >= 0 ? 'text-green-600' : 'text-red-600'}>
+                              {formatCurrency(wallet.netFlow)}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 justify-end mt-1">
                             {wallet.isFlagged && (
@@ -502,8 +566,8 @@ export default function AdminPage() {
                                 Flagged
                               </Badge>
                             )}
-                            <Badge variant="outline" className="text-xs">
-                              {wallet.transferCount > 0 ? 'Active' : 'New'}
+                            <Badge variant={wallet.totalTransferCount > 0 ? "default" : "secondary"} className="text-xs">
+                              {wallet.totalTransferCount > 0 ? 'Active' : 'New'}
                             </Badge>
                           </div>
                         </div>

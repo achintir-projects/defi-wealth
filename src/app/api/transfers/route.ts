@@ -56,9 +56,27 @@ export async function POST(request: NextRequest) {
       }
       
       // Get recipient user by address
-      const toUser = await db.user.findUnique({
+      let toUser = await db.user.findUnique({
         where: { walletAddress: toAddress }
       })
+      
+      // If recipient doesn't exist, create them automatically
+      if (!toUser) {
+        console.log('Creating new recipient user for wallet:', toAddress)
+        toUser = await db.user.create({
+          data: {
+            email: `user-${toAddress.substring(0, 8)}@defi-wealth.com`,
+            walletAddress: toAddress,
+            role: 'user'
+          }
+        })
+        
+        // Initialize portfolio for the new recipient user
+        const { initializePortfolio } = await import('@/app/api/wallet/route')
+        await initializePortfolio(toUser.id, toAddress)
+        
+        console.log('Created new recipient user:', toUser.id, 'for wallet:', toAddress)
+      }
       
       // Get both users' balances for the token
       const fromBalance = await db.userTokenBalance.findUnique({
