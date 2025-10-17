@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         })
         
         // Initialize portfolio for the new recipient user
-        const { initializePortfolio } = await import('@/app/api/wallet/route')
+        const { initializePortfolio } = await import('@/lib/portfolioUtils')
         await initializePortfolio(toUser.id, toAddress)
         
         console.log('Created new recipient user:', toUser.id, 'for wallet:', toAddress)
