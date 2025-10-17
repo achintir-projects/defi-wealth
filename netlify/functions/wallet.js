@@ -3,20 +3,14 @@ const { PrismaClient } = require('@prisma/client')
 // Initialize Prisma client for serverless environment
 let prisma
 
-if (process.env.NODE_ENV === 'production') {
-  prisma = new PrismaClient({
-    log: ['query', 'info', 'warn', 'error'],
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL || 'file:./prisma/db/custom.db'
-      }
+prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'],
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL || 'file:./prisma/db/custom.db'
     }
-  })
-} else {
-  prisma = new PrismaClient({
-    log: ['query'],
-  })
-}
+  }
+})
 
 // Helper function to initialize portfolio with default tokens
 async function initializePortfolio(userId, walletAddress) {
