@@ -13,8 +13,8 @@ async function initializePortfolio(userId: string, walletAddress: string) {
       name: 'Bitcoin',
       logo: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       decimals: 8,
-      marketPrice: realTimePrices.get('BTC')?.current_price || 102000,
-      displayPrice: realTimePrices.get('BTC')?.current_price || 102000,
+      marketPrice: realTimePrices.get('BTC')?.current_price || 109000,
+      displayPrice: realTimePrices.get('BTC')?.current_price || 109000,
       displayType: 'display'
     },
     {
@@ -22,8 +22,8 @@ async function initializePortfolio(userId: string, walletAddress: string) {
       name: 'Ethereum',
       logo: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628',
       decimals: 18,
-      marketPrice: realTimePrices.get('ETH')?.current_price || 4200,
-      displayPrice: realTimePrices.get('ETH')?.current_price || 4200,
+      marketPrice: realTimePrices.get('ETH')?.current_price || 3900,
+      displayPrice: realTimePrices.get('ETH')?.current_price || 3900,
       displayType: 'display'
     },
     {
@@ -40,8 +40,8 @@ async function initializePortfolio(userId: string, walletAddress: string) {
       name: 'BNB',
       logo: 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1696501970',
       decimals: 18,
-      marketPrice: realTimePrices.get('BNB')?.current_price || 725,
-      displayPrice: realTimePrices.get('BNB')?.current_price || 725,
+      marketPrice: realTimePrices.get('BNB')?.current_price || 1148,
+      displayPrice: realTimePrices.get('BNB')?.current_price || 1148,
       displayType: 'display'
     },
     {
@@ -49,8 +49,8 @@ async function initializePortfolio(userId: string, walletAddress: string) {
       name: 'Solana',
       logo: 'https://assets.coingecko.com/coins/images/4128/large/solana.png?1696504756',
       decimals: 9,
-      marketPrice: realTimePrices.get('SOL')?.current_price || 210,
-      displayPrice: realTimePrices.get('SOL')?.current_price || 210,
+      marketPrice: realTimePrices.get('SOL')?.current_price || 187,
+      displayPrice: realTimePrices.get('SOL')?.current_price || 187,
       displayType: 'display'
     },
     {
@@ -58,8 +58,8 @@ async function initializePortfolio(userId: string, walletAddress: string) {
       name: 'Cardano',
       logo: 'https://assets.coingecko.com/coins/images/975/large/Cardano.png?1696502090',
       decimals: 6,
-      marketPrice: realTimePrices.get('ADA')?.current_price || 0.68,
-      displayPrice: realTimePrices.get('ADA')?.current_price || 0.68,
+      marketPrice: realTimePrices.get('ADA')?.current_price || 0.65,
+      displayPrice: realTimePrices.get('ADA')?.current_price || 0.65,
       displayType: 'display'
     },
     {
@@ -67,8 +67,8 @@ async function initializePortfolio(userId: string, walletAddress: string) {
       name: 'Polkadot',
       logo: 'https://assets.coingecko.com/coins/images/12171/large/polkadot_new_logo.png?1696503150',
       decimals: 10,
-      marketPrice: realTimePrices.get('DOT')?.current_price || 10.85,
-      displayPrice: realTimePrices.get('DOT')?.current_price || 10.85,
+      marketPrice: realTimePrices.get('DOT')?.current_price || 3.04,
+      displayPrice: realTimePrices.get('DOT')?.current_price || 3.04,
       displayType: 'display'
     },
     {
@@ -76,8 +76,8 @@ async function initializePortfolio(userId: string, walletAddress: string) {
       name: 'Ripple',
       logo: 'https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png?1696501442',
       decimals: 6,
-      marketPrice: realTimePrices.get('XRP')?.current_price || 0.72,
-      displayPrice: realTimePrices.get('XRP')?.current_price || 0.72,
+      marketPrice: realTimePrices.get('XRP')?.current_price || 2.36,
+      displayPrice: realTimePrices.get('XRP')?.current_price || 2.36,
       displayType: 'display'
     },
     {
@@ -85,8 +85,8 @@ async function initializePortfolio(userId: string, walletAddress: string) {
       name: 'Dogecoin',
       logo: 'https://assets.coingecko.com/coins/images/5/large/dogecoin.png?1696501449',
       decimals: 8,
-      marketPrice: realTimePrices.get('DOGE')?.current_price || 0.195,
-      displayPrice: realTimePrices.get('DOGE')?.current_price || 0.195,
+      marketPrice: realTimePrices.get('DOGE')?.current_price || 0.19,
+      displayPrice: realTimePrices.get('DOGE')?.current_price || 0.19,
       displayType: 'display'
     },
     {
@@ -94,8 +94,8 @@ async function initializePortfolio(userId: string, walletAddress: string) {
       name: 'Avalanche',
       logo: 'https://assets.coingecko.com/coins/images/12559/large/Avalanche_Circle_Red_W_Text.svg?1696503360',
       decimals: 18,
-      marketPrice: realTimePrices.get('AVAX')?.current_price || 48.5,
-      displayPrice: realTimePrices.get('AVAX')?.current_price || 48.5,
+      marketPrice: realTimePrices.get('AVAX')?.current_price || 20.92,
+      displayPrice: realTimePrices.get('AVAX')?.current_price || 20.92,
       displayType: 'display'
     },
     {
@@ -103,8 +103,8 @@ async function initializePortfolio(userId: string, walletAddress: string) {
       name: 'Polygon',
       logo: 'https://assets.coingecko.com/coins/images/4713/large/polygon_token.png?1696502367',
       decimals: 18,
-      marketPrice: realTimePrices.get('MATIC')?.current_price || 1.05,
-      displayPrice: realTimePrices.get('MATIC')?.current_price || 1.05,
+      marketPrice: realTimePrices.get('MATIC')?.current_price || 0.19,
+      displayPrice: realTimePrices.get('MATIC')?.current_price || 0.19,
       displayType: 'display'
     },
     {
@@ -112,8 +112,8 @@ async function initializePortfolio(userId: string, walletAddress: string) {
       name: 'Chainlink',
       logo: 'https://assets.coingecko.com/coins/images/877/large/chainlink_new_logo.png?1696502009',
       decimals: 18,
-      marketPrice: realTimePrices.get('LINK')?.current_price || 19.2,
-      displayPrice: realTimePrices.get('LINK')?.current_price || 19.2,
+      marketPrice: realTimePrices.get('LINK')?.current_price || 17.5,
+      displayPrice: realTimePrices.get('LINK')?.current_price || 17.5,
       displayType: 'display'
     }
   ]

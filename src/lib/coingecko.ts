@@ -66,114 +66,114 @@ export class CoinGeckoService {
           console.log('CoinGecko API response data keys:', Object.keys(data))
           console.log('Successfully fetched real-time prices from CoinGecko')
           
-          // Map CoinGecko response to our format
+          // Map CoinGecko response to our format using actual API data
           const realTimePrices: CoinGeckoPrice[] = [
             {
               symbol: 'BTC',
               id: 'bitcoin',
-              current_price: data.bitcoin?.usd || 102000,
-              price_change_percentage_24h: data.bitcoin?.usd_24h_change || 2.1,
-              market_cap: data.bitcoin?.usd_market_cap || 2010000000000,
-              total_volume: data.bitcoin?.usd_24h_vol || 45000000000,
+              current_price: data.bitcoin?.usd || 109000,
+              price_change_percentage_24h: data.bitcoin?.usd_24h_change || -2.3,
+              market_cap: data.bitcoin?.usd_market_cap || 2170000000000,
+              total_volume: data.bitcoin?.usd_24h_vol || 83000000000,
               last_updated: new Date().toISOString()
             },
             {
               symbol: 'ETH',
               id: 'ethereum',
-              current_price: data.ethereum?.usd || 4200,
-              price_change_percentage_24h: data.ethereum?.usd_24h_change || 1.8,
-              market_cap: data.ethereum?.usd_market_cap || 505000000000,
-              total_volume: data.ethereum?.usd_24h_vol || 22000000000,
+              current_price: data.ethereum?.usd || 3900,
+              price_change_percentage_24h: data.ethereum?.usd_24h_change || -2.5,
+              market_cap: data.ethereum?.usd_market_cap || 474000000000,
+              total_volume: data.ethereum?.usd_24h_vol || 44700000000,
               last_updated: new Date().toISOString()
             },
             {
               symbol: 'USDT',
               id: 'tether',
               current_price: data.tether?.usd || 1.00,
-              price_change_percentage_24h: data.tether?.usd_24h_change || 0.01,
-              market_cap: data.tether?.usd_market_cap || 98000000000,
-              total_volume: data.tether?.usd_24h_vol || 85000000000,
+              price_change_percentage_24h: data.tether?.usd_24h_change || -0.02,
+              market_cap: data.tether?.usd_market_cap || 181000000000,
+              total_volume: data.tether?.usd_24h_vol || 142000000000,
               last_updated: new Date().toISOString()
             },
             {
               symbol: 'BNB',
               id: 'binancecoin',
-              current_price: data.binancecoin?.usd || 725,
-              price_change_percentage_24h: data.binancecoin?.usd_24h_change || 3.2,
-              market_cap: data.binancecoin?.usd_market_cap || 105000000000,
-              total_volume: data.binancecoin?.usd_24h_vol || 3200000000,
+              current_price: data.binancecoin?.usd || 1148,
+              price_change_percentage_24h: data.binancecoin?.usd_24h_change || -3.1,
+              market_cap: data.binancecoin?.usd_market_cap || 160000000000,
+              total_volume: data.binancecoin?.usd_24h_vol || 4240000000,
               last_updated: new Date().toISOString()
             },
             {
               symbol: 'SOL',
               id: 'solana',
-              current_price: data.solana?.usd || 210,
-              price_change_percentage_24h: data.solana?.usd_24h_change || 4.5,
-              market_cap: data.solana?.usd_market_cap || 98000000000,
-              total_volume: data.solana?.usd_24h_vol || 5800000000,
+              current_price: data.solana?.usd || 187,
+              price_change_percentage_24h: data.solana?.usd_24h_change || -4.2,
+              market_cap: data.solana?.usd_market_cap || 102000000000,
+              total_volume: data.solana?.usd_24h_vol || 9980000000,
               last_updated: new Date().toISOString()
             },
             {
               symbol: 'ADA',
               id: 'cardano',
-              current_price: data.cardano?.usd || 0.85,
-              price_change_percentage_24h: data.cardano?.usd_24h_change || 2.8,
-              market_cap: data.cardano?.usd_market_cap || 30500000000,
-              total_volume: data.cardano?.usd_24h_vol || 950000000,
+              current_price: data.cardano?.usd || 0.65,
+              price_change_percentage_24h: data.cardano?.usd_24h_change || -3.3,
+              market_cap: data.cardano?.usd_market_cap || 23800000000,
+              total_volume: data.cardano?.usd_24h_vol || 1260000000,
               last_updated: new Date().toISOString()
             },
             {
               symbol: 'DOT',
               id: 'polkadot',
-              current_price: data.polkadot?.usd || 14.25,
-              price_change_percentage_24h: data.polkadot?.usd_24h_change || 3.5,
-              market_cap: data.polkadot?.usd_market_cap || 18200000000,
-              total_volume: data.polkadot?.usd_24h_vol || 680000000,
+              current_price: data.polkadot?.usd || 3.04,
+              price_change_percentage_24h: data.polkadot?.usd_24h_change || -2.9,
+              market_cap: data.polkadot?.usd_market_cap || 4630000000,
+              total_volume: data.polkadot?.usd_24h_vol || 352000000,
               last_updated: new Date().toISOString()
             },
             {
               symbol: 'XRP',
               id: 'ripple',
-              current_price: data.ripple?.usd || 0.89,
-              price_change_percentage_24h: data.ripple?.usd_24h_change || 1.2,
-              market_cap: data.ripple?.usd_market_cap || 48500000000,
-              total_volume: data.ripple?.usd_24h_vol || 2100000000,
+              current_price: data.ripple?.usd || 2.36,
+              price_change_percentage_24h: data.ripple?.usd_24h_change || -2.7,
+              market_cap: data.ripple?.usd_market_cap || 141000000000,
+              total_volume: data.ripple?.usd_24h_vol || 6880000000,
               last_updated: new Date().toISOString()
             },
             {
               symbol: 'DOGE',
               id: 'dogecoin',
-              current_price: data.dogecoin?.usd || 0.285,
-              price_change_percentage_24h: data.dogecoin?.usd_24h_change || 5.2,
-              market_cap: data.dogecoin?.usd_market_cap || 41500000000,
-              total_volume: data.dogecoin?.usd_24h_vol || 3200000000,
+              current_price: data.dogecoin?.usd || 0.19,
+              price_change_percentage_24h: data.dogecoin?.usd_24h_change || -3.7,
+              market_cap: data.dogecoin?.usd_market_cap || 28700000000,
+              total_volume: data.dogecoin?.usd_24h_vol || 3270000000,
               last_updated: new Date().toISOString()
             },
             {
               symbol: 'AVAX',
               id: 'avalanche-2',
-              current_price: data['avalanche-2']?.usd || 65.5,
-              price_change_percentage_24h: data['avalanche-2']?.usd_24h_change || 4.1,
-              market_cap: data['avalanche-2']?.usd_market_cap || 24500000000,
-              total_volume: data['avalanche-2']?.usd_24h_vol || 950000000,
+              current_price: data['avalanche-2']?.usd || 20.92,
+              price_change_percentage_24h: data['avalanche-2']?.usd_24h_change || -4.9,
+              market_cap: data['avalanche-2']?.usd_market_cap || 8930000000,
+              total_volume: data['avalanche-2']?.usd_24h_vol || 808000000,
               last_updated: new Date().toISOString()
             },
             {
               symbol: 'MATIC',
               id: 'matic-network',
-              current_price: data['matic-network']?.usd || 1.05,
-              price_change_percentage_24h: data['matic-network']?.usd_24h_change || 2.5,
-              market_cap: data['matic-network']?.usd_market_cap || 9800000000,
-              total_volume: data['matic-network']?.usd_24h_vol || 850000000,
+              current_price: data['matic-network']?.usd || 0.19,
+              price_change_percentage_24h: data['matic-network']?.usd_24h_change || -3.1,
+              market_cap: data['matic-network']?.usd_market_cap || 0,
+              total_volume: data['matic-network']?.usd_24h_vol || 157000,
               last_updated: new Date().toISOString()
             },
             {
               symbol: 'LINK',
               id: 'chainlink',
-              current_price: data.chainlink?.usd || 19.2,
-              price_change_percentage_24h: data.chainlink?.usd_24h_change || 3.8,
-              market_cap: data.chainlink?.usd_market_cap || 11200000000,
-              total_volume: data.chainlink?.usd_24h_vol || 680000000,
+              current_price: data.chainlink?.usd || 17.5,
+              price_change_percentage_24h: data.chainlink?.usd_24h_change || -3.3,
+              market_cap: data.chainlink?.usd_market_cap || 12200000000,
+              total_volume: data.chainlink?.usd_24h_vol || 965000000,
               last_updated: new Date().toISOString()
             }
           ]
@@ -210,114 +210,114 @@ export class CoinGeckoService {
       console.error('Error fetching real-time prices, using fallback:', error)
       
       // Use realistic fallback prices that work reliably in Netlify
-      // But update them to be more realistic and current
+      // Updated to current market prices (October 2025)
       const realTimePrices: CoinGeckoPrice[] = [
         {
           symbol: 'BTC',
           id: 'bitcoin',
-          current_price: 109000, // Updated to more realistic current price
+          current_price: 109000, // Current market price
           price_change_percentage_24h: -2.3,
-          market_cap: 2150000000000,
-          total_volume: 48000000000,
+          market_cap: 2170000000000,
+          total_volume: 83000000000,
           last_updated: new Date().toISOString()
         },
         {
           symbol: 'ETH',
           id: 'ethereum',
-          current_price: 4300, // Updated to more realistic current price
-          price_change_percentage_24h: -1.8,
-          market_cap: 520000000000,
-          total_volume: 24000000000,
+          current_price: 3900, // Current market price
+          price_change_percentage_24h: -2.5,
+          market_cap: 474000000000,
+          total_volume: 44700000000,
           last_updated: new Date().toISOString()
         },
         {
           symbol: 'USDT',
           id: 'tether',
           current_price: 1.00,
-          price_change_percentage_24h: 0.01,
-          market_cap: 98000000000,
-          total_volume: 85000000000,
+          price_change_percentage_24h: -0.02,
+          market_cap: 181000000000,
+          total_volume: 142000000000,
           last_updated: new Date().toISOString()
         },
         {
           symbol: 'BNB',
           id: 'binancecoin',
-          current_price: 745,
-          price_change_percentage_24h: 3.2,
-          market_cap: 105000000000,
-          total_volume: 3200000000,
+          current_price: 1148,
+          price_change_percentage_24h: -3.1,
+          market_cap: 160000000000,
+          total_volume: 4240000000,
           last_updated: new Date().toISOString()
         },
         {
           symbol: 'SOL',
           id: 'solana',
-          current_price: 225,
-          price_change_percentage_24h: 4.5,
+          current_price: 187,
+          price_change_percentage_24h: -4.2,
           market_cap: 102000000000,
-          total_volume: 5800000000,
+          total_volume: 9980000000,
           last_updated: new Date().toISOString()
         },
         {
           symbol: 'ADA',
           id: 'cardano',
-          current_price: 0.92,
-          price_change_percentage_24h: 2.8,
-          market_cap: 32500000000,
-          total_volume: 950000000,
+          current_price: 0.65,
+          price_change_percentage_24h: -3.3,
+          market_cap: 23800000000,
+          total_volume: 1260000000,
           last_updated: new Date().toISOString()
         },
         {
           symbol: 'DOT',
           id: 'polkadot',
-          current_price: 15.25,
-          price_change_percentage_24h: 3.5,
-          market_cap: 19200000000,
-          total_volume: 680000000,
+          current_price: 3.04,
+          price_change_percentage_24h: -2.9,
+          market_cap: 4630000000,
+          total_volume: 352000000,
           last_updated: new Date().toISOString()
         },
         {
           symbol: 'XRP',
           id: 'ripple',
-          current_price: 0.95,
-          price_change_percentage_24h: 1.2,
-          market_cap: 53500000000,
-          total_volume: 2100000000,
+          current_price: 2.36,
+          price_change_percentage_24h: -2.7,
+          market_cap: 141000000000,
+          total_volume: 6880000000,
           last_updated: new Date().toISOString()
         },
         {
           symbol: 'DOGE',
           id: 'dogecoin',
-          current_price: 0.32,
-          price_change_percentage_24h: 5.2,
-          market_cap: 46500000000,
-          total_volume: 3200000000,
+          current_price: 0.19,
+          price_change_percentage_24h: -3.7,
+          market_cap: 28700000000,
+          total_volume: 3270000000,
           last_updated: new Date().toISOString()
         },
         {
           symbol: 'AVAX',
           id: 'avalanche-2',
-          current_price: 68.5,
-          price_change_percentage_24h: 4.1,
-          market_cap: 26500000000,
-          total_volume: 950000000,
+          current_price: 20.92,
+          price_change_percentage_24h: -4.9,
+          market_cap: 8930000000,
+          total_volume: 808000000,
           last_updated: new Date().toISOString()
         },
         {
           symbol: 'MATIC',
           id: 'matic-network',
-          current_price: 1.15,
-          price_change_percentage_24h: 2.5,
-          market_cap: 10800000000,
-          total_volume: 850000000,
+          current_price: 0.19,
+          price_change_percentage_24h: -3.1,
+          market_cap: 0,
+          total_volume: 157000,
           last_updated: new Date().toISOString()
         },
         {
           symbol: 'LINK',
           id: 'chainlink',
-          current_price: 21.2,
-          price_change_percentage_24h: 3.8,
+          current_price: 17.5,
+          price_change_percentage_24h: -3.3,
           market_cap: 12200000000,
-          total_volume: 680000000,
+          total_volume: 965000000,
           last_updated: new Date().toISOString()
         }
       ]
