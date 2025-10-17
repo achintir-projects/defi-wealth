@@ -84,13 +84,13 @@ export async function initializePortfolio(userId: string, walletAddress: string)
           }
         },
         update: {
-          balance: initialBalance,
+          actualBalance: initialBalance,
           displayBalance: initialBalance
         },
         create: {
           userId: userId,
           tokenSymbol: tokenData.symbol,
-          balance: initialBalance,
+          actualBalance: initialBalance,
           displayBalance: initialBalance
         }
       })
