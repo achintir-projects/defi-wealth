@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      String   @default("user") // "user" or "admin"
+  walletAddress String? @unique // Unique wallet address for receiving tokens
+  isFlagged Boolean  @default(false) // Flag for suspicious activity
+  flagReason String? // Reason for flagging
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  tokenBalances UserTokenBalance[]
+  sentTransfers Transfer[]       @relation("SentTransfers")
+  receivedTransfers Transfer[]   @relation("ReceivedTransfers")
+}
+
+model Token {
+  id          String   @id @default(cuid())
+  symbol      String   @unique
+  name        String
+  logo        String?
+  decimals    Int
+  marketPrice Float    @default(0) // Actual market price
+  displayPrice Float   @default(0) // Price shown to users (admin-controlled)
+  displayType String   @default("display") // "display" or "market"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  userBalances UserTokenBalance[]
+  transfers    Transfer[]
+}
+
+model UserTokenBalance {
+  id          String   @id @default(cuid())
+  userId      String
+  tokenSymbol String
+  actualBalance Float  @default(0) // Real balance
+  displayBalance Float @default(0) // Balance shown to users (admin-controlled)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token Token @relation(fields: [tokenSymbol], references: [symbol], onDelete: Cascade)
+  
+  @@unique([userId, tokenSymbol])
+}
+
+model Transfer {
+  id          String   @id @default(cuid())
+  fromUserId  String
+  fromAddress String   // Sender's wallet address
+  toUserId    String?
+  toAddress   String   // Recipient's wallet address
+  tokenSymbol String
+  amount      Float
+  status      String   @default("completed") // "pending", "completed", "failed"
+  txHash      String?  // Transaction hash for reference
+  metadata    Json?    // Additional metadata for admin operations
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  fromUser User  @relation("SentTransfers", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User? @relation("ReceivedTransfers", fields: [toUserId], references: [id], onDelete: Cascade)
+  token    Token @relation(fields: [tokenSymbol], references: [symbol], onDelete: Cascade)
+}
